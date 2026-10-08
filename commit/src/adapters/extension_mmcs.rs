@@ -6,7 +6,7 @@ use p3_field::{ExtensionField, Field};
 use p3_matrix::extension::FlatMatrixView;
 use p3_matrix::{Dimensions, Matrix};
 
-use crate::{BatchOpening, BatchOpeningRef, Mmcs};
+use crate::{BatchOpening, BatchOpeningRef, HidingMmcs, Mmcs};
 
 /// A wrapper to lift an MMCS from a base field `F` to an extension field `EF`.
 ///
@@ -142,4 +142,14 @@ where
             proof,
         )
     }
+}
+
+// The rows the inner MMCS commits are the base-field coefficients of the extension rows,
+// so hiding the former hides the latter.
+impl<F, EF, InnerMmcs> HidingMmcs<EF> for ExtensionMmcs<F, EF, InnerMmcs>
+where
+    F: Field,
+    EF: ExtensionField<F>,
+    InnerMmcs: HidingMmcs<F>,
+{
 }

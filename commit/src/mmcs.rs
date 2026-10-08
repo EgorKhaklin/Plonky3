@@ -198,6 +198,17 @@ pub trait Mmcs<T: Send + Sync + Clone>: Clone {
     ) -> Result<(), Self::Error>;
 }
 
+/// An [`Mmcs`] whose commitments hide the rows it never opens.
+///
+/// A plain Merkle tree leaks information about unopened leaves unless they are already
+/// random. A hiding MMCS salts every leaf, so the commitment reveals nothing about the
+/// committed matrices beyond the rows that are opened. Zero-knowledge PCSs, such as
+/// `HidingFriPcs` in `p3-fri`, require this bound on every MMCS they commit with.
+///
+/// Implementing this trait is a security claim: implement it only for a scheme that hides
+/// every unopened row.
+pub trait HidingMmcs<T: Send + Sync + Clone>: Mmcs<T> {}
+
 /// Lets a shared reference be used wherever an owned [`Mmcs`] is expected.
 impl<T: Send + Sync + Clone, M: Mmcs<T>> Mmcs<T> for &M {
     type ProverData<Mat> = M::ProverData<Mat>;
